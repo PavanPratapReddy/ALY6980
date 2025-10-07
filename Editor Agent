@@ -1,0 +1,19 @@
+"""
+Editor Agent
+-------------
+Combines multiple domain reports into one market report.
+"""
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/merge', methods=['POST'])
+def merge_reports():
+    data = request.json.get("domain_reports", [])
+    combined = "\n\n".join([f"{r['domain']}: {r['summary']}" for r in data])
+    final_report = f"=== MARKET INSIGHT REPORT ===\n{combined}"
+    return jsonify({"final_report": final_report, "executive_summary": "Summary ready!"})
+
+if __name__ == '__main__':
+    app.run(port=5007)
