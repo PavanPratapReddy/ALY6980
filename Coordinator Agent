@@ -1,0 +1,33 @@
+"""
+Coordinator Agent
+-----------------
+Main controller — triggers all domain agents, collects reports,
+calls the Editor and Recommender Agents.
+"""
+
+from flask import Flask, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+@app.route('/start_cycle', methods=['POST'])
+def start_cycle():
+    reports = []
+    for port, domain in [(5004, "Finance"), (5005, "Tech"), (5006, "Healthcare")]:
+        try:
+            r = requests.post(f"http://localhost:{port}/run_cycle").json()
+            reports.append(r)
+        except Exception as e:
+            reports.append({"domain": domain, "error": str(e)})
+
+    final = requests.post("http://localhost:5007/merge", json={"domain_reports": reports}).json()
+    recommendations = requests.post("http://localhost:5009/recommend", json={"domain_reports": reports}).json()
+
+    return jsonify({
+        "final_report": final["final_report"],
+        "executive_summary": final["executive_summary"],
+        "recommendations": recommendations["recommendations"]
+    })
+
+if __name__ == '__main__':
+    app.run(port=5008)
