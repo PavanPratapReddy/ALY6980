@@ -1,0 +1,24 @@
+"""
+Summarizer Agent
+----------------
+Creates concise summaries and assigns simple sentiment (positive/neutral/negative).
+"""
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/summarize', methods=['POST'])
+def summarize_text():
+    data = request.json
+    text = data.get("text", "")
+    summary = f"Summary: {text[:80]}..."  # Mock summarization
+    sentiment = "neutral"
+    if "rise" in text or "growth" in text:
+        sentiment = "positive"
+    elif "drop" in text or "loss" in text:
+        sentiment = "negative"
+    return jsonify({"summary": summary, "sentiment": sentiment})
+
+if __name__ == '__main__':
+    app.run(port=5002)
