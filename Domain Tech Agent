@@ -1,0 +1,29 @@
+"""
+Tech Domain Agent
+-----------------
+Handles technology industry insights.
+"""
+
+from flask import Flask, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+@app.route('/run_cycle', methods=['POST'])
+def run_cycle():
+    query = "technology trends"
+    res = requests.post("http://localhost:5001/search", json={"query": query, "domain": "tech"}).json()
+    article = res["results"][0]
+    summary = requests.post("http://localhost:5002/summarize", json={"text": article}).json()
+    critique = requests.post("http://localhost:5003/critique", json={"summary": summary["summary"]}).json()
+
+    domain_report = {
+        "domain": "Tech",
+        "summary": summary["summary"],
+        "sentiment": summary["sentiment"],
+        "score": critique["score"]
+    }
+    return jsonify(domain_report)
+
+if __name__ == '__main__':
+    app.run(port=5005)
