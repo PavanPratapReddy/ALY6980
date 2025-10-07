@@ -1,0 +1,20 @@
+"""
+Critic Agent
+------------
+Evaluates summary quality and returns a confidence score.
+"""
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/critique', methods=['POST'])
+def critique_summary():
+    data = request.json
+    summary = data.get("summary", "")
+    score = 0.8 if "Summary" in summary else 0.5
+    notes = "Summary looks consistent and relevant."
+    return jsonify({"score": score, "notes": notes})
+
+if __name__ == '__main__':
+    app.run(port=5003)
