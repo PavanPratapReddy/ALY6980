@@ -1,0 +1,37 @@
+
+---
+
+# 1️⃣ registry_agent.py
+```python
+"""
+Registry Agent
+--------------
+Keeps a directory of all agents and their capabilities.
+Agents can register themselves here for easy discovery.
+"""
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+registry = {}
+
+@app.route('/register', methods=['POST'])
+def register_agent():
+    data = request.json
+    name = data.get("name")
+    capability = data.get("capability")
+    endpoint = data.get("endpoint")
+    registry[name] = {"capability": capability, "endpoint": endpoint}
+    return jsonify({"message": f"{name} registered successfully!"})
+
+@app.route('/agents', methods=['GET'])
+def get_agents():
+    capability = request.args.get("capability")
+    if capability:
+        agents = {k: v for k, v in registry.items() if v["capability"] == capability}
+    else:
+        agents = registry
+    return jsonify(agents)
+
+if __name__ == '__main__':
+    app.run(port=5000)
