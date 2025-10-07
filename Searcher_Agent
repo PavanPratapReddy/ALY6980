@@ -1,0 +1,22 @@
+"""
+Searcher Agent
+--------------
+Fetches latest articles or market data.
+For now, returns mock data — can be extended with NewsAPI or RSS feeds.
+"""
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/search', methods=['POST'])
+def search_news():
+    data = request.json
+    query = data.get("query")
+    domain = data.get("domain")
+    # Placeholder logic
+    results = [f"Sample article about {query} in {domain} industry."]
+    return jsonify({"results": results})
+
+if __name__ == '__main__':
+    app.run(port=5001)
